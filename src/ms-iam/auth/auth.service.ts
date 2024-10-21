@@ -1,6 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import * as jwt from 'jsonwebtoken';
+import jwtDecode from 'jwt-decode';
 import * as bcrypt from 'bcryptjs';
+import * as jwt from 'jsonwebtoken';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from '../schemas/user.schema';
@@ -44,13 +45,33 @@ export class AuthService {
   async refreshToken(refreshToken: string) {
     try {
       const decoded = jwt.verify(refreshToken, this.jwtRefreshSecret);
-      const newAccessToken = jwt.sign({ userId: (decoded as any).userId, email: (decoded as any).email }, this.jwtSecret, { expiresIn: '10s' });
-      const newRefreshToken = jwt.sign({ userId: (decoded as any).userId, email: (decoded as any).email }, this.jwtRefreshSecret, { expiresIn: '20s' });
-  
+
+      // Verificar si el refreshToken está a punto de caducar (en los próximos 30 segundos)
+      const now = Math.floor(Date.now() / 1000);
+      const refreshExpiration = (decoded as any).exp;
+      const refreshTokenIsAboutToExpire = refreshExpiration - now < 30;
+
+      // Generar siempre un nuevo accessToken
+      const newAccessToken = jwt.sign(
+        { userId: (decoded as any).userId, email: (decoded as any).email },
+        this.jwtSecret,
+        { expiresIn: '3m' }
+      );
+
+      let newRefreshToken = refreshToken; // Mantener el refreshToken actual
+
+      // Solo generar un nuevo refreshToken si está cerca de caducar
+      if (refreshTokenIsAboutToExpire) {
+        newRefreshToken = jwt.sign(
+          { userId: (decoded as any).userId, email: (decoded as any).email },
+          this.jwtRefreshSecret,
+          { expiresIn: '5m' }
+        );
+      }
+
       return { accessToken: newAccessToken, refreshToken: newRefreshToken };
     } catch (error) {
       throw new UnauthorizedException('Refresh token inválido o expirado');
     }
   }
-  
 }

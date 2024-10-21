@@ -7,7 +7,7 @@ async function bootstrap() {
 
   // Habilitar CORS para localhost y Vercel
   app.enableCors({
-    origin: ['http://localhost:8080', 'http://localhost:8081', 'https://web-movil-jc6bmgqpc-crissss17s-projects.vercel.app'], // Agrega tu dominio de Vercel
+    origin: ['https://gonna-crest-martha-render.trycloudflare.com', 'http://localhost:8080'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization'],
