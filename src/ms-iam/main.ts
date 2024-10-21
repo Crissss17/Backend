@@ -5,17 +5,16 @@ import { ValidationPipe } from '@nestjs/common';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Habilitar CORS para localhost y Vercel
+  
   app.enableCors({
-    origin: ['https://gonna-crest-martha-render.trycloudflare.com', 'http://localhost:8080'],
+    origin: ['http://localhost:8083'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
-  // Usa los pipes de validación
   app.useGlobalPipes(new ValidationPipe());
 
-  await app.listen(8082); // Puerto donde se ejecuta tu backend
+  await app.listen(8082); 
 }
 bootstrap();

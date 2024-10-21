@@ -15,12 +15,12 @@ export class UserService {
   async create(createUserDto: CreateUserDto): Promise<User> {
     const { password } = createUserDto;
     
-    // Asegúrate de que la contraseña esté definida
+    
     if (!password || typeof password !== 'string') {
       throw new Error('La contraseña es obligatoria y debe ser una cadena de texto');
     }
     
-    // Encriptar la contraseña antes de guardarla
+   
     const hashedPassword = await bcrypt.hash(password, 10);
     const createdUser = new this.userModel({ ...createUserDto, password: hashedPassword });
     
@@ -28,7 +28,7 @@ export class UserService {
   }
 
   async findAll(): Promise<User[]> {
-    return this.userModel.find().exec();  // Retorna todos los usuarios
+    return this.userModel.find().exec();  
   }
 
   findOne(id: string) {

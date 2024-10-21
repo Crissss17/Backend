@@ -15,8 +15,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         dbName: configService.get<string>('MONGODB_DATABASE'),
       }),
     }),
-    UserModule,  // Registro de UserModule
-    AuthModule,  // Asegúrate de registrar AuthModule aquí
+    UserModule,  
+    AuthModule,  
   ],
   controllers: [],
   providers: [],
