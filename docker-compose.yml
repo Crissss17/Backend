@@ -1,4 +1,5 @@
-version: '3.9'
+version: '3.8'
+
 services:
   mongo-server:
     image: mongo:latest
@@ -21,7 +22,7 @@ services:
       ME_CONFIG_MONGODB_SERVER: mongo-server
       ME_CONFIG_MONGODB_PORT: 27017
     ports:
-      - "27017:27017"
+      - "8081:8081"  # Cambiado para evitar conflicto
     networks:
       - mongodb_network
 
