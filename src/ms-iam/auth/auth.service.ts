@@ -25,10 +25,13 @@ export class AuthService {
       throw new UnauthorizedException('Contraseña incorrecta');
     }
 
-    const accessToken = jwt.sign({ userId: user._id, email: user.email }, this.jwtSecret, { expiresIn: '15m' });
-    console.log('Generated access token:', accessToken);  // Agrega este log
-    const refreshToken = jwt.sign({ userId: user._id, email: user.email }, this.jwtRefreshSecret, { expiresIn: '7d' });
-    console.log('Generated refresh token:', refreshToken);  
+    // Generar accessToken con un tiempo de expiración muy corto (por ejemplo, 10 segundos)
+    const accessToken = jwt.sign({ userId: user._id, email: user.email }, this.jwtSecret, { expiresIn: '10s' });
+    console.log('Generated access token:', accessToken);
+
+    // Generar refreshToken con un tiempo de expiración corto para pruebas (por ejemplo, 30 segundos)
+    const refreshToken = jwt.sign({ userId: user._id, email: user.email }, this.jwtRefreshSecret, { expiresIn: '30s' });
+    console.log('Generated refresh token:', refreshToken);
 
     return { accessToken, refreshToken };
   }
@@ -48,31 +51,30 @@ export class AuthService {
     try {
       const decoded = jwt.verify(refreshToken, this.jwtRefreshSecret);
 
-      // Verificar si el refreshToken está a punto de caducar (en los próximos 30 segundos)
-      const now = Math.floor(Date.now() / 1000);
-      const refreshExpiration = (decoded as any).exp;
-      const refreshTokenIsAboutToExpire = refreshExpiration - now < 30;
-
-      // Generar siempre un nuevo accessToken
       const newAccessToken = jwt.sign(
         { userId: (decoded as any).userId, email: (decoded as any).email },
         this.jwtSecret,
-        { expiresIn: '15m' }  // Cambié a 15 minutos
+        { expiresIn: '10s' }  // Vuelve a generar el accessToken con un tiempo corto de expiración
       );
 
-      let newRefreshToken = refreshToken; // Mantener el refreshToken actual
+      let newRefreshToken = refreshToken;
 
-      // Solo generar un nuevo refreshToken si está cerca de caducar
+      // Si el refreshToken está a punto de expirar, genera uno nuevo
+      const now = Math.floor(Date.now() / 1000);
+      const refreshExpiration = (decoded as any).exp;
+      const refreshTokenIsAboutToExpire = refreshExpiration - now < 10; // Renueva si faltan menos de 10 segundos
+
       if (refreshTokenIsAboutToExpire) {
         newRefreshToken = jwt.sign(
           { userId: (decoded as any).userId, email: (decoded as any).email },
           this.jwtRefreshSecret,
-          { expiresIn: '7d' }  // Cambié a 7 días
+          { expiresIn: '30s' }  // También puedes cambiar el tiempo del refreshToken para las pruebas
         );
       }
 
       return { accessToken: newAccessToken, refreshToken: newRefreshToken };
     } catch (error) {
+      console.error('Error al refrescar el token:', error);
       throw new UnauthorizedException('Refresh token inválido o expirado');
     }
   }
