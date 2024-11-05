@@ -13,7 +13,7 @@ export class AuthService {
 
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
-  // Servicio de Login
+  
   async login(email: string, password: string) {
     const user = await this.userModel.findOne({ email }).exec();
     if (!user) {
@@ -25,18 +25,18 @@ export class AuthService {
       throw new UnauthorizedException('Contraseña incorrecta');
     }
 
-    // Generar accessToken con un tiempo de expiración muy corto (por ejemplo, 10 segundos)
-    const accessToken = jwt.sign({ userId: user._id, email: user.email }, this.jwtSecret, { expiresIn: '10s' });
+  
+    const accessToken = jwt.sign({ userId: user._id, email: user.email }, this.jwtSecret, { expiresIn: '5m' });
     console.log('Generated access token:', accessToken);
 
-    // Generar refreshToken con un tiempo de expiración corto para pruebas (por ejemplo, 30 segundos)
-    const refreshToken = jwt.sign({ userId: user._id, email: user.email }, this.jwtRefreshSecret, { expiresIn: '30s' });
+    
+    const refreshToken = jwt.sign({ userId: user._id, email: user.email }, this.jwtRefreshSecret, { expiresIn: '7m' });
     console.log('Generated refresh token:', refreshToken);
 
     return { accessToken, refreshToken };
   }
 
-  // Servicio para verificar el token (checkToken)
+  
   async checkToken(token: string) {
     try {
       const decoded = jwt.verify(token, this.jwtSecret);
@@ -46,7 +46,7 @@ export class AuthService {
     }
   }
 
-  // Servicio para refrescar el token (refreshToken)
+  
   async refreshToken(refreshToken: string) {
     try {
       const decoded = jwt.verify(refreshToken, this.jwtRefreshSecret);
@@ -54,21 +54,21 @@ export class AuthService {
       const newAccessToken = jwt.sign(
         { userId: (decoded as any).userId, email: (decoded as any).email },
         this.jwtSecret,
-        { expiresIn: '10s' }  // Vuelve a generar el accessToken con un tiempo corto de expiración
+        { expiresIn: '10s' }  
       );
 
       let newRefreshToken = refreshToken;
 
-      // Si el refreshToken está a punto de expirar, genera uno nuevo
+      
       const now = Math.floor(Date.now() / 1000);
       const refreshExpiration = (decoded as any).exp;
-      const refreshTokenIsAboutToExpire = refreshExpiration - now < 10; // Renueva si faltan menos de 10 segundos
+      const refreshTokenIsAboutToExpire = refreshExpiration - now < 10;
 
       if (refreshTokenIsAboutToExpire) {
         newRefreshToken = jwt.sign(
           { userId: (decoded as any).userId, email: (decoded as any).email },
           this.jwtRefreshSecret,
-          { expiresIn: '30s' }  // También puedes cambiar el tiempo del refreshToken para las pruebas
+          { expiresIn: '30s' }  
         );
       }
 
