@@ -4,7 +4,7 @@ import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { User } from '../schemas/user.schema';
+import { User } from '../users/user.schema';
 
 @Injectable()
 export class AuthService {
@@ -19,22 +19,20 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException('Usuario no encontrado');
     }
-
+  
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       throw new UnauthorizedException('Contraseña incorrecta');
     }
-
   
+    // Genera los tokens
     const accessToken = jwt.sign({ userId: user._id, email: user.email }, this.jwtSecret, { expiresIn: '5m' });
-    console.log('Generated access token:', accessToken);
-
-    
     const refreshToken = jwt.sign({ userId: user._id, email: user.email }, this.jwtRefreshSecret, { expiresIn: '7m' });
-    console.log('Generated refresh token:', refreshToken);
-
-    return { accessToken, refreshToken };
+  
+    // Incluye el userId en la respuesta
+    return { accessToken, refreshToken, userId: user._id };
   }
+  
 
   
   async checkToken(token: string) {
@@ -54,7 +52,7 @@ export class AuthService {
       const newAccessToken = jwt.sign(
         { userId: (decoded as any).userId, email: (decoded as any).email },
         this.jwtSecret,
-        { expiresIn: '10s' }  
+        { expiresIn: '5m' }  
       );
 
       let newRefreshToken = refreshToken;
@@ -68,7 +66,7 @@ export class AuthService {
         newRefreshToken = jwt.sign(
           { userId: (decoded as any).userId, email: (decoded as any).email },
           this.jwtRefreshSecret,
-          { expiresIn: '30s' }  
+          { expiresIn: '5m' }  
         );
       }
 

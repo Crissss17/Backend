@@ -10,7 +10,8 @@ import {
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/createUser.dto';
 import { UpdateUserDto } from './dto/updateUser.dto';
-@Controller('users')  
+
+@Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -37,5 +38,10 @@ export class UserController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.userService.remove(id);
+  }
+
+  @Get(':id/machines')
+  async findMachinesByUser(@Param('id') id: string) {
+    return this.userService.findMachinesByUser(id);
   }
 }

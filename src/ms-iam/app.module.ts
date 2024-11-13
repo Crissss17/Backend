@@ -1,8 +1,10 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserModule } from './users/user.module';
-import { AuthModule } from './auth/auth.module';  // Agrega AuthModule
+import { AuthModule } from './auth/auth.module'; 
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { AreasModule } from './area/area.module';
+import { MachineModule } from './machine/machine.module';
 
 @Module({
   imports: [
@@ -17,6 +19,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     }),
     UserModule,  
     AuthModule,  
+    AreasModule,
+    MachineModule,
   ],
   controllers: [],
   providers: [],
