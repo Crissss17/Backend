@@ -3,7 +3,7 @@ import { Document } from 'mongoose';
 
 @Schema()
 export class Area extends Document {
-  @Prop({ required: true})
+  @Prop()
   _id: string;  
 
   @Prop()

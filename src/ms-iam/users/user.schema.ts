@@ -27,6 +27,9 @@ export class User extends Document {
 
   @Prop({ type: String, ref: 'Area', required: true }) 
   area_id: string;
+
+  @Prop({ unique: true }) 
+  biometricId?: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

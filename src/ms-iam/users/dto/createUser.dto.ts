@@ -1,4 +1,3 @@
-// src/users/dto/createUser.dto.ts
 import { IsEmail, IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateUserDto {
@@ -26,4 +25,7 @@ export class CreateUserDto {
 
   @IsNotEmpty()
   area_id: string; 
+
+  @IsOptional()
+  biometricId?: string;
 }

@@ -1,4 +1,3 @@
-// src/areas/dto/create-area.dto.ts
 import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateAreaDto {

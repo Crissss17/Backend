@@ -1,4 +1,3 @@
-// src/areas/area.module.ts
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AreasController } from './area.controller';
